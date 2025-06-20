@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,6 +53,15 @@ class LibraryViewModel @Inject constructor(
             } catch (e: Exception) {
                 // Handle error
             }
+        }
+    }
+    
+    fun exportBooksToCsv(onExported: (File) -> Unit) {
+        viewModelScope.launch {
+            val books = (uiState.value as? LibraryUiState.Success)?.books ?: return@launch
+            val file = File.createTempFile("libreria_books_", ".csv")
+            com.example.libreria.util.CsvExporter.exportBooksToCsv(books, file)
+            onExported(file)
         }
     }
 }

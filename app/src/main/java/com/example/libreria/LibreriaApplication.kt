@@ -8,7 +8,9 @@ import coil.memory.MemoryCache
 import coil.util.DebugLogger
 import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
+//import dagger.hilt.android.HiltAndroidApp
+
+
 class LibreriaApplication : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)

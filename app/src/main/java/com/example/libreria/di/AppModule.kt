@@ -27,7 +27,9 @@ object AppModule {
         context,
         LibreriaDatabase::class.java,
         LibreriaDatabase.DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(LibreriaDatabase.MIGRATION_1_2)
+        .build()
     
     @Provides
     @Singleton

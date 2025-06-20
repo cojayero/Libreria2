@@ -15,5 +15,7 @@ data class Book(
     val synopsis: String?,
     val bookcaseNumber: Int?,
     val shelfNumber: Int?,
+    val editorial: String?, // Nuevo campo
+    val pageCount: Int?,   // Nuevo campo
     val addedDate: Long = System.currentTimeMillis()
 )

@@ -11,5 +11,7 @@ data class WishlistBook(
     val author: String,
     val coverUrl: String?,
     val price: Double?,
+    val editorial: String?, // Nuevo campo
+    val pageCount: Int?,   // Nuevo campo
     val addedDate: Long = System.currentTimeMillis()
 )

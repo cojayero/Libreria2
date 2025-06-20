@@ -90,6 +90,12 @@ private fun BookDetailContent(book: Book) {
             contentScale = ContentScale.Fit
         )
 
+        // ISBN
+        Text(
+            text = "ISBN: ${book.isbn}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
         // Title
         Text(
             text = book.title,
@@ -100,6 +106,18 @@ private fun BookDetailContent(book: Book) {
         Text(
             text = "By ${book.author}",
             style = MaterialTheme.typography.titleMedium
+        )
+
+        // Publisher (Editorial)
+        Text(
+            text = "Editorial: ${book.editorial ?: "No disponible"}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        // Number of pages
+        Text(
+            text = "Páginas: ${book.pageCount?.toString() ?: "No disponible"}",
+            style = MaterialTheme.typography.bodyMedium
         )
 
         // Location

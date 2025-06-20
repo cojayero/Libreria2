@@ -23,7 +23,9 @@ data class BookInfo(
     val authors: List<String>?,
     val description: String?,
     val imageLinks: ImageLinks?,
-    val averageRating: Double?
+    val averageRating: Double?,
+    val publisher: String?, // Añadido
+    val pageCount: Int?     // Añadido
 )
 
 data class SaleInfo(

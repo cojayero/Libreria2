@@ -23,7 +23,7 @@ import com.example.libreria.ui.library.LibraryScreen
 import com.example.libreria.ui.scan.ScanScreen
 import com.example.libreria.ui.wishlist.WishlistScreen
 import com.example.libreria.ui.wishlist.WishlistDetailScreen
-import com.example.libreria.ui.bookdetail.BookDetailScreen
+import com.example.libreria.ui.BookDetailScreen
 import com.example.libreria.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
 

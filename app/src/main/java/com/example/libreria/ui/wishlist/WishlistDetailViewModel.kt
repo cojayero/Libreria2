@@ -34,7 +34,9 @@ class WishlistDetailViewModel @Inject constructor(
                 review = null,
                 synopsis = null,
                 bookcaseNumber = bookcaseNumber,
-                shelfNumber = shelfNumber
+                shelfNumber = shelfNumber,
+                editorial = null, // No disponible desde WishlistBook
+                pageCount = null  // No disponible desde WishlistBook
             )
             
             // Add to library and remove from wishlist

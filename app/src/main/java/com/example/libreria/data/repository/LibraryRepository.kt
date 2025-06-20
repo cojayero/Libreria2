@@ -24,19 +24,22 @@ class LibraryRepository @Inject constructor(
     suspend fun searchBookByIsbn(isbn: String): Result<Book> {
         return try {
             val response = booksApi.searchBookByIsbn("isbn:$isbn")
-            val volumeInfo = response.items?.firstOrNull()?.volumeInfo
+            val volume = response.items?.firstOrNull()
                 ?: return Result.failure(Exception("Book not found"))
-                
+            val volumeInfo = volume.volumeInfo
+            val saleInfo = volume.saleInfo
             val book = Book(
                 isbn = isbn,
                 title = volumeInfo.title,
                 author = volumeInfo.authors?.joinToString(", ") ?: "Unknown",
                 coverUrl = volumeInfo.imageLinks?.thumbnail,
-                price = response.items.firstOrNull()?.saleInfo?.listPrice?.amount,
+                price = saleInfo?.listPrice?.amount,
                 review = null,
                 synopsis = volumeInfo.description,
                 bookcaseNumber = null,
-                shelfNumber = null
+                shelfNumber = null,
+                editorial = volumeInfo.publisher, // Corregido
+                pageCount = volumeInfo.pageCount // Corregido
             )
             Result.success(book)
         } catch (e: Exception) {
