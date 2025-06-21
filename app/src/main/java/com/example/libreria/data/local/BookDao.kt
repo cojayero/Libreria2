@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookDao {
     @Query("SELECT * FROM books ORDER BY addedDate DESC")
-    fun getAllBooks(): Flow<List<Book>>    @Query("SELECT * FROM books WHERE isbn = :isbn")
+    fun getAllBooks(): Flow<List<Book>>
+
+    @Query("SELECT * FROM books WHERE isbn = :isbn")
     fun getBookByIsbn(isbn: String): Flow<Book?>
 
     @Query("SELECT * FROM books WHERE bookcaseNumber = :bookcaseNumber AND shelfNumber = :shelfNumber")

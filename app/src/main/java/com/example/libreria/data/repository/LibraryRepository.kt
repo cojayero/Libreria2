@@ -5,6 +5,7 @@ import com.example.libreria.data.local.WishlistDao
 import com.example.libreria.data.model.Book
 import com.example.libreria.data.model.WishlistBook
 import com.example.libreria.data.remote.GoogleBooksApi
+import com.example.libreria.util.CoverUrlDebugger
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,22 +25,25 @@ class LibraryRepository @Inject constructor(
     suspend fun searchBookByIsbn(isbn: String): Result<Book> {
         return try {
             val response = booksApi.searchBookByIsbn("isbn:$isbn")
+            // Debug: log the cover URL
+            CoverUrlDebugger.debugCoverUrl(booksApi, isbn)
             val volume = response.items?.firstOrNull()
-                ?: return Result.failure(Exception("Book not found"))
-            val volumeInfo = volume.volumeInfo
+            val volumeInfo = volume?.volumeInfo ?: return Result.failure(Exception("Book not found"))
             val saleInfo = volume.saleInfo
+            val rawCoverUrl = volumeInfo.imageLinks?.thumbnail
+            val coverUrl = rawCoverUrl?.replace("http://", "https://")
             val book = Book(
                 isbn = isbn,
                 title = volumeInfo.title,
                 author = volumeInfo.authors?.joinToString(", ") ?: "Unknown",
-                coverUrl = volumeInfo.imageLinks?.thumbnail,
+                coverUrl = coverUrl,
                 price = saleInfo?.listPrice?.amount,
                 review = null,
                 synopsis = volumeInfo.description,
                 bookcaseNumber = null,
                 shelfNumber = null,
-                editorial = volumeInfo.publisher, // Corregido
-                pageCount = volumeInfo.pageCount // Corregido
+                editorial = volumeInfo.publisher,
+                pageCount = volumeInfo.pageCount
             )
             Result.success(book)
         } catch (e: Exception) {

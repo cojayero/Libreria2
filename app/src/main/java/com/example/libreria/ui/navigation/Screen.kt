@@ -10,4 +10,7 @@ sealed class Screen(val route: String) {
     object WishlistDetail : Screen("wishlist_detail/{isbn}") {
         fun createRoute(isbn: String) = "wishlist_detail/$isbn"
     }
+    object EditBook : Screen("editBook/{isbn}") {
+        fun createRoute(isbn: String) = "editBook/$isbn"
+    }
 }

@@ -6,6 +6,7 @@ import com.example.libreria.data.model.Book
 import com.example.libreria.data.repository.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +22,29 @@ class BookDetailViewModel @Inject constructor(
     fun updateBookLocation(isbn: String, bookcaseNumber: Int, shelfNumber: Int) {
         viewModelScope.launch {
             repository.updateBookLocation(isbn, bookcaseNumber, shelfNumber)
+        }
+    }
+    
+    fun deleteBook(book: Book, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.deleteBook(book)
+            onComplete()
+        }
+    }
+    
+    fun addOrUpdateBook(book: Book, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.addBook(book)
+            onComplete()
+        }
+    }
+
+    fun updateBookCoverPath(isbn: String, path: String?) {
+        viewModelScope.launch {
+            val book = repository.getBookByIsbn(isbn).first()
+            if (book != null) {
+                repository.addBook(book.copy(coverUrl = path))
+            }
         }
     }
 }

@@ -6,6 +6,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,9 +26,6 @@ import java.util.concurrent.Executors
 import androidx.camera.lifecycle.ProcessCameraProvider
 import android.content.pm.PackageManager
 import android.util.Size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import com.example.libreria.ui.navigation.Screen
 
 @Composable
@@ -139,7 +139,7 @@ private fun CameraPreview(
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(view.surfaceProvider)
+                    it.surfaceProvider = view.surfaceProvider
                 }
 
             val imageAnalyzer = ImageAnalysis.Builder()
