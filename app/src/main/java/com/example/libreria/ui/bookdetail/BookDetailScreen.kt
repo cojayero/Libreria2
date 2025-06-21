@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.libreria.ui.BookDetailViewModel
+import com.example.libreria.util.AppPreferences
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UNUSED_PARAMETER")
@@ -18,6 +20,9 @@ fun BookDetailScreen(
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
     val book by viewModel.getBook(isbn).collectAsState(initial = null)
+    val context = LocalContext.current
+    val defaultBookcase = AppPreferences.getDefaultBookcase(context)
+    val defaultShelf = AppPreferences.getDefaultShelf(context)
 
     Column(
         modifier = Modifier
@@ -34,15 +39,33 @@ fun BookDetailScreen(
                 text = "By ${bookInfo.author}",
                 style = MaterialTheme.typography.bodyLarge
             )
+            // Mostrar precio si está disponible
+            if (bookInfo.price != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Precio: €${"%.2f".format(bookInfo.price)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Precio: No disponible",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Location:",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Bookcase ${bookInfo.bookcaseNumber}, Shelf ${bookInfo.shelfNumber}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            // Ubicación
+            if (bookInfo.bookcaseNumber != null && bookInfo.shelfNumber != null) {
+                Text(
+                    text = "Estantería: ${bookInfo.bookcaseNumber}, Repisa: ${bookInfo.shelfNumber}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else if (!defaultBookcase.isNullOrBlank() && !defaultShelf.isNullOrBlank()) {
+                Text(
+                    text = "Estantería: $defaultBookcase, Repisa: $defaultShelf (por defecto)",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             
             Spacer(modifier = Modifier.height(24.dp))
             

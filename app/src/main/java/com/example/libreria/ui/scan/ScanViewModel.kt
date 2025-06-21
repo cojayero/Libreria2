@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libreria.data.model.Book
 import com.example.libreria.data.repository.LibraryRepository
+import com.example.libreria.util.AppPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,10 +38,16 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun addBookToLibrary(book: Book) {
+    fun addBookToLibrary(book: Book, context: android.content.Context) {
         viewModelScope.launch {
             try {
-                repository.addBook(book)
+                val bookcase = book.bookcaseNumber ?: AppPreferences.getDefaultBookcase(context)?.toIntOrNull()
+                val shelf = book.shelfNumber ?: AppPreferences.getDefaultShelf(context)?.toIntOrNull()
+                val bookWithLocation = book.copy(
+                    bookcaseNumber = bookcase,
+                    shelfNumber = shelf
+                )
+                repository.addBook(bookWithLocation)
                 _uiState.value = ScanUiState.BookSaved
             } catch (e: Exception) {
                 _uiState.value = ScanUiState.Error(e.message ?: "Error saving book")
