@@ -60,7 +60,7 @@ class LibraryViewModel @Inject constructor(
         viewModelScope.launch {
             val books = (uiState.value as? LibraryUiState.Success)?.books ?: return@launch
             val file = File.createTempFile("libreria_books_", ".csv")
-            com.example.libreria.util.CsvExporter.exportBooksToCsv(books, file)
+            com.example.libreria.util.CsvExporter.exportBooksToCsv(books, file, separator = '\t')
             onExported(file)
         }
     }

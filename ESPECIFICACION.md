@@ -83,6 +83,53 @@ data class WishlistBook(
 ## Exportación
 - Permite exportar la base de datos de libros a CSV y compartirla por email mediante un icono.
 
+## Sincronización con Servidor Local (FastAPI)
+
+La aplicación puede sincronizar su base de datos de libros y wishlist con un servidor Python en la red local. El servidor expone endpoints REST para:
+- Obtener todos los libros y wishlist
+- Añadir, actualizar y eliminar libros y wishlist
+- Sincronizar cambios entre varios dispositivos
+
+### Requisitos del servidor
+- Implementado en Python usando FastAPI
+- Accesible en la red local (por ejemplo, http://192.168.1.100:8000)
+- Almacena los datos en una base de datos SQLite compatible con los modelos de la app
+- Proporciona endpoints CRUD para ambos modelos
+
+### Prompt para generación automática del servidor (ChatGPT/Copilot):
+
+> Crea un servidor Python usando FastAPI que implemente los siguientes modelos y exponga endpoints REST para CRUD y sincronización. Usa SQLite como base de datos. El servidor debe ser accesible en la red local y permitir la sincronización de datos con una app Android. Incluye endpoints para obtener, crear, actualizar y eliminar tanto libros como wishlist. Los modelos son:
+>
+> ```python
+> from pydantic import BaseModel
+> from typing import Optional
+> import datetime
+>
+> class Book(BaseModel):
+>     isbn: str
+>     title: str
+>     author: str
+>     coverUrl: Optional[str]
+>     price: Optional[float]
+>     review: Optional[str]
+>     synopsis: Optional[str]
+>     bookcaseNumber: Optional[int]
+>     shelfNumber: Optional[int]
+>     editorial: Optional[str]
+>     pageCount: Optional[int]
+>     addedDate: Optional[int]  # timestamp
+>
+> class WishlistBook(BaseModel):
+>     isbn: str
+>     title: str
+>     author: str
+>     coverUrl: Optional[str]
+>     price: Optional[float]
+>     editorial: Optional[str]
+>     pageCount: Optional[int]
+>     addedDate: Optional[int]  # timestamp
+> ```
+
 ## Dependencias Clave
 - Jetpack Compose (UI)
 - Room (persistencia local)

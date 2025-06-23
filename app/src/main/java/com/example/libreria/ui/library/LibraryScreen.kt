@@ -18,6 +18,11 @@ import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import java.io.OutputStream
 import com.example.libreria.data.model.WishlistBook
 import com.example.libreria.ui.wishlist.WishlistViewModel
 
@@ -35,6 +40,24 @@ fun LibraryScreen(
     val context = LocalContext.current
     var filter by remember { mutableStateOf("Todos") }
 
+    // Launcher para crear documento en Drive (formato CSV)
+    val createDocumentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri: Uri? ->
+        if (uri != null) {
+            viewModel.exportBooksToCsv { csvFile ->
+                try {
+                    val outputStream: OutputStream? = context.contentResolver.openOutputStream(uri)
+                    csvFile.inputStream().use { input ->
+                        outputStream?.use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
     val wishlistIsbns = (wishlistState as? com.example.libreria.ui.wishlist.WishlistUiState.Success)?.books?.map { it.isbn }?.toSet() ?: emptySet()
     val wishlistBooks = (wishlistState as? com.example.libreria.ui.wishlist.WishlistUiState.Success)?.books ?: emptyList()
 
@@ -50,25 +73,33 @@ fun LibraryScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 FilterChip(selected = filter == "Wishlist", onClick = { filter = "Wishlist" }, label = { Text("Wishlist") })
             }
-            IconButton(onClick = {
-                viewModel.exportBooksToCsv { csvFile ->
-                    val uri = androidx.core.content.FileProvider.getUriForFile(
-                        context,
-                        context.packageName + ".provider",
-                        csvFile
-                    )
-                    val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                        type = "text/csv"
-                        putExtra(android.content.Intent.EXTRA_SUBJECT, "Exportación de libros")
-                        putExtra(android.content.Intent.EXTRA_STREAM, uri)
-                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            Row {
+                IconButton(onClick = {
+                    viewModel.exportBooksToCsv { csvFile ->
+                        val uri = androidx.core.content.FileProvider.getUriForFile(
+                            context,
+                            context.packageName + ".provider",
+                            csvFile
+                        )
+                        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                            type = "text/csv"
+                            putExtra(android.content.Intent.EXTRA_SUBJECT, "Exportación de libros")
+                            putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        context.startActivity(
+                            android.content.Intent.createChooser(intent, "Enviar base de datos por email")
+                        )
                     }
-                    context.startActivity(
-                        android.content.Intent.createChooser(intent, "Enviar base de datos por email")
-                    )
+                }) {
+                    Icon(Icons.Default.Email, contentDescription = "Exportar CSV por Email")
                 }
-            }) {
-                Icon(Icons.Default.Email, contentDescription = "Exportar CSV por Email")
+                IconButton(onClick = {
+                    // Lanzar selector para guardar en Drive como CSV (tabulador)
+                    createDocumentLauncher.launch("libreria.csv")
+                }) {
+                    Icon(Icons.Default.CloudUpload, contentDescription = "Guardar en Google Drive (CSV)")
+                }
             }
         }
         when (val state = uiState) {

@@ -5,9 +5,9 @@ import java.io.File
 import java.io.FileWriter
 
 object CsvExporter {
-    fun exportBooksToCsv(books: List<Book>, file: File) {
+    fun exportBooksToCsv(books: List<Book>, file: File, separator: Char = '\t') {
         FileWriter(file).use { writer ->
-            writer.appendLine("ISBN,Título,Autor,Editorial,Páginas,Precio,Ubicación,Fecha,Sinopsis")
+            writer.appendLine(listOf("ISBN", "Título", "Autor", "Editorial", "Páginas", "Precio", "Ubicación", "Fecha", "Sinopsis").joinToString(separator.toString()))
             for (book in books) {
                 writer.appendLine(listOf(
                     book.isbn,
@@ -19,7 +19,7 @@ object CsvExporter {
                     "${book.bookcaseNumber ?: ""}-${book.shelfNumber ?: ""}",
                     book.addedDate.toString(),
                     book.synopsis?.replace("\n", " ") ?: ""
-                ).joinToString(",") { it.replace(",", " ") })
+                ).joinToString(separator.toString()) { it.replace(separator.toString(), " ") })
             }
         }
     }
