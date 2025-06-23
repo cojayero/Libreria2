@@ -24,9 +24,12 @@ fun EditBookScreen(
     var editorial by remember { mutableStateOf("") }
     var pageCount by remember { mutableStateOf("") }
     var synopsis by remember { mutableStateOf("") }
+<<<<<<< HEAD
     var bookcaseNumber by remember { mutableStateOf("") }
     var shelfNumber by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
+=======
+>>>>>>> origin/master
 
     LaunchedEffect(book.value) {
         book.value?.let {
@@ -35,9 +38,12 @@ fun EditBookScreen(
             editorial = it.editorial ?: ""
             pageCount = it.pageCount?.toString() ?: ""
             synopsis = it.synopsis ?: ""
+<<<<<<< HEAD
             bookcaseNumber = it.bookcaseNumber?.toString() ?: ""
             shelfNumber = it.shelfNumber?.toString() ?: ""
             price = it.price?.toString() ?: ""
+=======
+>>>>>>> origin/master
         }
     }
 
@@ -90,6 +96,7 @@ fun EditBookScreen(
                 label = { Text("Sinopsis") },
                 modifier = Modifier.fillMaxWidth()
             )
+<<<<<<< HEAD
             OutlinedTextField(
                 value = bookcaseNumber,
                 onValueChange = { bookcaseNumber = it },
@@ -109,6 +116,8 @@ fun EditBookScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
             )
+=======
+>>>>>>> origin/master
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
@@ -117,10 +126,14 @@ fun EditBookScreen(
                         author = author,
                         editorial = editorial,
                         pageCount = pageCount.toIntOrNull(),
+<<<<<<< HEAD
                         synopsis = synopsis,
                         bookcaseNumber = bookcaseNumber.toIntOrNull(),
                         shelfNumber = shelfNumber.toIntOrNull(),
                         price = price.toDoubleOrNull()
+=======
+                        synopsis = synopsis
+>>>>>>> origin/master
                     )
                     if (updatedBook != null) {
                         viewModel.addOrUpdateBook(updatedBook) {

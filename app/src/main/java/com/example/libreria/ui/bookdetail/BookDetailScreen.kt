@@ -46,6 +46,7 @@ fun BookDetailScreen(
                     text = "Precio: €${"%.2f".format(bookInfo.price)}",
                     style = MaterialTheme.typography.bodyMedium
                 )
+<<<<<<< HEAD
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -58,6 +59,17 @@ fun BookDetailScreen(
             if (bookInfo.bookcaseNumber != null && bookInfo.shelfNumber != null) {
                 Text(
                     text = "Estantería: ${bookInfo.bookcaseNumber}, Repisa: ${bookInfo.shelfNumber}",
+=======
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Location:",
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (bookInfo.bookcaseNumber != null && bookInfo.shelfNumber != null) {
+                Text(
+                    text = "Bookcase ${bookInfo.bookcaseNumber}, Shelf ${bookInfo.shelfNumber}",
+>>>>>>> origin/master
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else if (!defaultBookcase.isNullOrBlank() && !defaultShelf.isNullOrBlank()) {
