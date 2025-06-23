@@ -1,6 +1,8 @@
 package com.example.libreria.ui.bookdetail
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ fun BookDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
         book?.let { bookInfo ->
@@ -46,7 +49,7 @@ fun BookDetailScreen(
                     text = "Precio: €${"%.2f".format(bookInfo.price)}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-<<<<<<< HEAD
+
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -59,7 +62,8 @@ fun BookDetailScreen(
             if (bookInfo.bookcaseNumber != null && bookInfo.shelfNumber != null) {
                 Text(
                     text = "Estantería: ${bookInfo.bookcaseNumber}, Repisa: ${bookInfo.shelfNumber}",
-=======
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -69,7 +73,7 @@ fun BookDetailScreen(
             if (bookInfo.bookcaseNumber != null && bookInfo.shelfNumber != null) {
                 Text(
                     text = "Bookcase ${bookInfo.bookcaseNumber}, Shelf ${bookInfo.shelfNumber}",
->>>>>>> origin/master
+
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else if (!defaultBookcase.isNullOrBlank() && !defaultShelf.isNullOrBlank()) {
