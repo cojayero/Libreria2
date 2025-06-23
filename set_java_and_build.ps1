@@ -9,7 +9,7 @@ if (Test-Path $androidStudioJdk) {
 } else {
     Write-Host "Android Studio JDK not found at $androidStudioJdk. Please update the script with the correct path."
 }
-
+./gradlew clean
 # Limpiar carpetas de build y caché antes de compilar
 Remove-Item -Recurse -Force .\app\build, .\build, .\.gradle -ErrorAction SilentlyContinue
 
