@@ -15,6 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Email
+import com.example.libreria.data.model.WishlistBook
+import com.example.libreria.ui.wishlist.WishlistViewModel
 
 import com.example.libreria.data.model.Book
 import com.example.libreria.ui.navigation.Screen
@@ -22,22 +27,35 @@ import com.example.libreria.ui.navigation.Screen
 @Composable
 fun LibraryScreen(
     navController: NavController,
-    viewModel: LibraryViewModel = hiltViewModel()
+    viewModel: LibraryViewModel = hiltViewModel(),
+    wishlistViewModel: WishlistViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val wishlistState by wishlistViewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var filter by remember { mutableStateOf("Todos") }
+
+    val wishlistIsbns = (wishlistState as? com.example.libreria.ui.wishlist.WishlistUiState.Success)?.books?.map { it.isbn }?.toSet() ?: emptySet()
+    val wishlistBooks = (wishlistState as? com.example.libreria.ui.wishlist.WishlistUiState.Success)?.books ?: emptyList()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = {
-                viewModel.exportBooksToCsv { file ->
+            Row {
+                FilterChip(selected = filter == "Todos", onClick = { filter = "Todos" }, label = { Text("Todos") })
+                Spacer(modifier = Modifier.width(8.dp))
+                FilterChip(selected = filter == "Biblioteca", onClick = { filter = "Biblioteca" }, label = { Text("Biblioteca") })
+                Spacer(modifier = Modifier.width(8.dp))
+                FilterChip(selected = filter == "Wishlist", onClick = { filter = "Wishlist" }, label = { Text("Wishlist") })
+            }
+            IconButton(onClick = {
+                viewModel.exportBooksToCsv { csvFile ->
                     val uri = androidx.core.content.FileProvider.getUriForFile(
                         context,
                         context.packageName + ".provider",
-                        file
+                        csvFile
                     )
                     val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                         type = "text/csv"
@@ -50,7 +68,7 @@ fun LibraryScreen(
                     )
                 }
             }) {
-                Text("Exportar CSV por Email")
+                Icon(Icons.Default.Email, contentDescription = "Exportar CSV por Email")
             }
         }
         when (val state = uiState) {
@@ -63,16 +81,29 @@ fun LibraryScreen(
                 }
             }
             is LibraryUiState.Success -> {
+                val books = when (filter) {
+                    "Todos" -> state.books + wishlistBooks.filter { w -> state.books.none { it.isbn == w.isbn } }
+                    "Biblioteca" -> state.books
+                    "Wishlist" -> wishlistBooks.filter { w -> state.books.none { it.isbn == w.isbn } }
+                    else -> state.books
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 160.dp),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.books) { book ->
+                    items(books) { book ->
+                        val isbn = when (book) {
+                            is Book -> book.isbn
+                            is WishlistBook -> book.isbn
+                            else -> ""
+                        }
+                        val isWishlist = wishlistIsbns.contains(isbn)
                         BookCard(
                             book = book,
-                            onClick = { navController.navigate(Screen.BookDetail.createRoute(book.isbn)) }
+                            isWishlist = isWishlist,
+                            onClick = { navController.navigate(Screen.BookDetail.createRoute(isbn)) }
                         )
                     }
                 }
@@ -92,7 +123,8 @@ fun LibraryScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookCard(
-    book: Book,
+    book: Any, // Puede ser Book o WishlistBook
+    isWishlist: Boolean = false,
     onClick: () -> Unit
 ) {
     Card(
@@ -101,29 +133,48 @@ fun BookCard(
             .clickable(onClick = onClick)
     ) {
         Column {
+            val coverUrl = when (book) {
+                is Book -> book.coverUrl
+                is WishlistBook -> book.coverUrl
+                else -> null
+            }
+            val title = when (book) {
+                is Book -> book.title
+                is WishlistBook -> book.title
+                else -> ""
+            }
+            val author = when (book) {
+                is Book -> book.author
+                is WishlistBook -> book.author
+                else -> ""
+            }
             AsyncImage(
-                model = book.coverUrl,
-                contentDescription = book.title,
+                model = coverUrl,
+                contentDescription = title,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
                 contentScale = ContentScale.Crop
             )
-            Column(
-                modifier = Modifier.padding(16.dp)
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = book.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = book.author,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                if (book.bookcaseNumber != null && book.shelfNumber != null) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Location: Bookcase ${book.bookcaseNumber}, Shelf ${book.shelfNumber}",
-                        style = MaterialTheme.typography.bodySmall
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = author,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (isWishlist) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Wishlist",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

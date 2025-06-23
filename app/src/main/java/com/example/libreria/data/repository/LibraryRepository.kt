@@ -70,4 +70,8 @@ class LibraryRepository @Inject constructor(
     suspend fun deleteBook(book: Book) {
         bookDao.deleteBook(book)
     }
+    
+    suspend fun getWishlistBookByIsbn(isbn: String): WishlistBook? {
+        return wishlistDao.getWishlistBookByIsbn(isbn)
+    }
 }

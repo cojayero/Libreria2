@@ -1,24 +1,11 @@
-<<<<<<< HEAD
 # Especificación Técnica - Librería
 
 ## Descripción General
-Aplicación Android para la gestión de una biblioteca personal. Permite escanear libros por ISBN, consultar detalles, editar información, fijar ubicación por defecto y almacenar los datos localmente.
+Aplicación Android para la gestión de una biblioteca personal. Permite escanear libros por ISBN, consultar detalles, editar información, fijar ubicación por defecto, gestionar una wishlist y exportar la base de datos por email en CSV.
 
 ## Estructura de Datos
 
 ### Modelo Book
-=======
-# Especificación Técnica: Librería App
-
-## Descripción General
-Librería App es una aplicación Android para la gestión personal de libros físicos. Permite escanear, registrar, consultar y organizar libros, así como gestionar una lista de deseos. Utiliza Jetpack Compose (Material3), Hilt, Room, Retrofit y la API de Google Books.
-
----
-
-## Estructura de Datos
-
-### Book (Libro)
->>>>>>> origin/master
 ```kotlin
 @Entity(tableName = "books")
 data class Book(
@@ -37,10 +24,30 @@ data class Book(
 )
 ```
 
-<<<<<<< HEAD
+### Modelo WishlistBook
+```kotlin
+@Entity(tableName = "wishlist")
+data class WishlistBook(
+    @PrimaryKey val isbn: String,
+    val title: String,
+    val author: String,
+    val coverUrl: String?,
+    val price: Double?,
+    val editorial: String?,
+    val pageCount: Int?,
+    val addedDate: Long = System.currentTimeMillis()
+)
+```
+
 ## Persistencia
-- **Room**: Almacena los libros localmente.
+- **Room**: Almacena los libros y la wishlist localmente.
 - **SharedPreferences**: Guarda la ubicación por defecto (estantería y repisa).
+
+## Funcionalidad Clave
+- **Escaneo de libros**: Permite añadir libros a la biblioteca o a la wishlist tras escanear el ISBN. Si el libro ya está en la biblioteca, muestra un mensaje. Si está en la wishlist, permite moverlo a la biblioteca.
+- **Filtro visual**: En la pantalla principal se puede alternar entre ver todos los libros, solo la biblioteca o solo la wishlist. Los libros de la wishlist se distinguen con un icono.
+- **Detalle y edición**: Las pantallas de detalle y edición tienen scroll vertical y muestran todos los campos, aunque sean largos.
+- **Exportar CSV**: Se puede exportar la base de datos de libros a CSV y enviarla por email mediante un icono en la barra superior.
 
 ## Lógica de Ubicación por Defecto
 - Al crear un nuevo libro, si no se especifica ubicación, se asigna la ubicación por defecto a los campos `bookcaseNumber` y `shelfNumber`.
@@ -53,10 +60,10 @@ data class Book(
 - En la ficha de detalle se muestra siempre el precio (o "No disponible").
 
 ## Pantallas Principales
-- **LibraryScreen**: Lista de libros.
+- **LibraryScreen**: Lista de libros, filtro visual, exportar CSV.
 - **BookDetailScreen**: Ficha de detalle (muestra todos los campos, permite editar y borrar).
 - **EditBookScreen**: Permite editar todos los campos, incluyendo ubicación y precio.
-- **ScanScreen**: Escaneo de ISBN y alta rápida de libros.
+- **ScanScreen**: Escaneo de ISBN y alta rápida de libros, opción de añadir a biblioteca o wishlist.
 
 ## Llamadas al API
 - **Retrofit** se usa para consultar la API de Google Books:
@@ -66,11 +73,15 @@ data class Book(
 ## Flujo de Alta de Libro
 1. El usuario escanea un ISBN.
 2. Se consulta la API de Google Books.
-3. Si el libro no existe en la base local, se muestra un diálogo de confirmación.
-4. Al confirmar, se crea el libro con los datos obtenidos y la ubicación por defecto (si no se especifica otra).
+3. Si el libro no existe en la base local ni en la wishlist, se muestra un diálogo para elegir si añadir a biblioteca o wishlist.
+4. Si está en la wishlist, se ofrece moverlo a la biblioteca.
+5. Si ya está en la biblioteca, se muestra un mensaje.
 
 ## Edición y Detalle
 - En la ficha de detalle y edición se pueden modificar todos los campos relevantes, incluyendo ubicación y precio.
+
+## Exportación
+- Permite exportar la base de datos de libros a CSV y compartirla por email mediante un icono.
 
 ## Dependencias Clave
 - Jetpack Compose (UI)
@@ -81,88 +92,4 @@ data class Book(
 
 ---
 
-*Última actualización: 2025-06-21*
-=======
-### GoogleBooksApi (API Remota)
-- **searchBookByIsbn(q: String): GoogleBooksResponse**
-  - Endpoint: `GET /volumes?q=isbn:<ISBN>`
-  - Respuesta:
-    ```kotlin
-    data class GoogleBooksResponse(val items: List<VolumeInfo>?)
-    data class VolumeInfo(val volumeInfo: BookInfo, val saleInfo: SaleInfo?)
-    data class BookInfo(
-        val title: String,
-        val authors: List<String>?,
-        val description: String?,
-        val imageLinks: ImageLinks?,
-        val averageRating: Double?,
-        val publisher: String?,
-        val pageCount: Int?
-    )
-    data class SaleInfo(val listPrice: Price?)
-    data class Price(val amount: Double)
-    data class ImageLinks(val thumbnail: String?)
-    ```
-
----
-
-## Lógica de Negocio y Flujo
-
-### 1. Registro y Consulta de Libros
-- El usuario puede escanear el ISBN de un libro (MLKit + CameraX).
-- Se consulta la API de Google Books para obtener los datos del libro.
-- El usuario puede editar y guardar la ficha en la base local (Room).
-- Se puede asignar ubicación física (estantería y repisa).
-- El precio (en euros) se muestra si está disponible en la API.
-
-### 2. Lista de Deseos (Wishlist)
-- Permite añadir libros que el usuario desea adquirir.
-- Se almacena en base local y puede consultarse desde la app.
-
-### 3. Ubicación por Defecto
-- El usuario puede fijar una ubicación por defecto (estantería y repisa).
-- Al registrar un libro nuevo, si no se especifica ubicación, se muestra la ubicación por defecto en la ficha.
-- La ubicación por defecto se almacena en `SharedPreferences` (vía `AppPreferences`).
-
-### 4. Exportación
-- Permite exportar la base de datos de libros a CSV y compartirla por email.
-
----
-
-## Estructura de Carpetas
-- `ui/` Pantallas y componentes de UI (Compose)
-- `data/model/` Modelos de datos (Room, API)
-- `data/local/` DAOs y base de datos Room
-- `data/remote/` Servicios de red (Retrofit)
-- `data/repository/` Lógica de acceso a datos
-- `util/` Utilidades (preferencias, exportación, imágenes)
-
----
-
-## Llamadas al API Externas
-- **GET https://www.googleapis.com/books/v1/volumes?q=isbn:<ISBN>**
-  - Devuelve información del libro, portada, sinopsis, editorial, número de páginas y precio si está disponible.
-
----
-
-## Dependencias Principales
-- Jetpack Compose (Material3)
-- Hilt (Inyección de dependencias)
-- Room (Base de datos local)
-- Retrofit (Cliente HTTP)
-- MLKit (Escaneo de códigos de barras)
-- CameraX (Cámara)
-
----
-
-## Notas de Uso
-- El precio se muestra en euros (€) si está disponible.
-- La ubicación por defecto se auto-rellena en la ficha si el libro no tiene una ubicación asignada.
-- El usuario puede editar la ubicación desde la ficha o fijar una ubicación por defecto desde el menú principal.
-
----
-
-## Autoría y Licencia
-- Proyecto personal para gestión de biblioteca doméstica.
-- Licencia: MIT (modificable según preferencia del autor).
->>>>>>> origin/master
+*Última actualización: 2025-06-23*

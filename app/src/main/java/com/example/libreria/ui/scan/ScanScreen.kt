@@ -83,10 +83,24 @@ fun ScanScreen(
                 )
             }
             is ScanUiState.BookFound -> {
-                BookFoundDialog(
+                BookFoundDialogWithWishlist(
                     book = state.book,
-                    onConfirm = {
+                    onAddToLibrary = {
                         viewModel.addBookToLibrary(state.book, context)
+                    },
+                    onAddToWishlist = {
+                        viewModel.addBookToWishlist(state.book)
+                    },
+                    onDismiss = {
+                        viewModel.resetState()
+                    }
+                )
+            }
+            is ScanUiState.WishlistBookFound -> {
+                WishlistBookFoundDialog(
+                    wishlistBook = state.wishlistBook,
+                    onMoveToLibrary = {
+                        viewModel.moveWishlistBookToLibrary(state.wishlistBook, context)
                     },
                     onDismiss = {
                         viewModel.resetState()
@@ -220,6 +234,84 @@ private fun BookFoundDialog(
                 Icon(Icons.Default.Close, contentDescription = null)
                 Spacer(Modifier.width(4.dp))
                 Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+private fun BookFoundDialogWithWishlist(
+    book: com.example.libreria.data.model.Book,
+    onAddToLibrary: () -> Unit,
+    onAddToWishlist: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Libro encontrado") },
+        text = {
+            Column {
+                Text("¿Dónde quieres añadir el libro?")
+                Spacer(Modifier.height(8.dp))
+                Text("Título: ${book.title}")
+                Text("Autor: ${book.author}")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onAddToLibrary) {
+                Icon(Icons.Default.Check, contentDescription = null)
+                Spacer(Modifier.width(4.dp))
+                Text("Añadir a Biblioteca")
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(onClick = onAddToWishlist) {
+                    Icon(Icons.Default.Check, contentDescription = null)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Añadir a Wishlist")
+                }
+                Spacer(Modifier.width(8.dp))
+                TextButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = null)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Cancelar")
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun WishlistBookFoundDialog(
+    wishlistBook: com.example.libreria.data.model.WishlistBook,
+    onMoveToLibrary: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Libro en Wishlist") },
+        text = {
+            Column {
+                Text("El libro ya está en tu wishlist.")
+                Text("¿Quieres moverlo a la biblioteca?")
+                Spacer(Modifier.height(8.dp))
+                Text("Título: ${wishlistBook.title}")
+                Text("Autor: ${wishlistBook.author}")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onMoveToLibrary) {
+                Icon(Icons.Default.Check, contentDescription = null)
+                Spacer(Modifier.width(4.dp))
+                Text("Mover a Biblioteca")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Icon(Icons.Default.Close, contentDescription = null)
+                Spacer(Modifier.width(4.dp))
+                Text("Cancelar")
             }
         }
     )

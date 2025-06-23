@@ -14,4 +14,7 @@ interface WishlistDao {
 
     @Delete
     suspend fun deleteWishlistBook(book: WishlistBook)
+
+    @Query("SELECT * FROM wishlist WHERE isbn = :isbn LIMIT 1")
+    suspend fun getWishlistBookByIsbn(isbn: String): WishlistBook?
 }
